@@ -26,7 +26,6 @@ import java.net.ConnectException;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -81,10 +80,10 @@ public class GithubRepositoryControllerTest {
     }
 
     @Test
-    public void shouldReturnRepositoryWithNullFieldValues() throws Exception {
+    public void shouldReturnRepositoryWhenNullFieldValues() throws Exception {
 
         // given
-        String repoJson = IOUtils.toString(getClass().getResourceAsStream("/integration/json/null-repo.json"));
+        String repoJson = IOUtils.toString(getClass().getResourceAsStream("/integration/json/null-values-repo.json"));
 
         // when
         mockServer.expect(requestTo("https://api.github.com/repos/test-owner/test-repo"))

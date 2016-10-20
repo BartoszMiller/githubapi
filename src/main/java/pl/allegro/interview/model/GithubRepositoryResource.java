@@ -1,9 +1,6 @@
 package pl.allegro.interview.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import pl.allegro.interview.util.DateFormatUtil;
-
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 public class GithubRepositoryResource {
 
@@ -11,10 +8,9 @@ public class GithubRepositoryResource {
     private final String description;
     private final String cloneUrl;
     private final Integer stars;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormatUtil.ISO_8601)
-    private final Date createdAt;
+    private final OffsetDateTime createdAt;
 
-    public GithubRepositoryResource(String fullName, String description, String cloneUrl, Integer stars, Date createdAt) {
+    public GithubRepositoryResource(String fullName, String description, String cloneUrl, Integer stars, OffsetDateTime createdAt) {
         this.fullName = fullName;
         this.description = description;
         this.cloneUrl = cloneUrl;
@@ -38,7 +34,7 @@ public class GithubRepositoryResource {
         return stars;
     }
 
-    public Date getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 }
