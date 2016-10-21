@@ -1,6 +1,6 @@
 package pl.allegro.interview.model;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public class GithubRepositoryResource {
 
@@ -8,9 +8,9 @@ public class GithubRepositoryResource {
     private final String description;
     private final String cloneUrl;
     private final Integer stars;
-    private final OffsetDateTime createdAt;
+    private final LocalDateTime createdAt;
 
-    public GithubRepositoryResource(String fullName, String description, String cloneUrl, Integer stars, OffsetDateTime createdAt) {
+    public GithubRepositoryResource(String fullName, String description, String cloneUrl, Integer stars, LocalDateTime createdAt) {
         this.fullName = fullName;
         this.description = description;
         this.cloneUrl = cloneUrl;
@@ -34,7 +34,7 @@ public class GithubRepositoryResource {
         return stars;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 }

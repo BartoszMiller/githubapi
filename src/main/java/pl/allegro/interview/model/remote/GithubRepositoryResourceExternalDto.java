@@ -2,7 +2,7 @@ package pl.allegro.interview.model.remote;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 public class GithubRepositoryResourceExternalDto {
 
@@ -10,7 +10,7 @@ public class GithubRepositoryResourceExternalDto {
     private String description;
     private String cloneUrl;
     private Integer stars;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     public GithubRepositoryResourceExternalDto() {
     }
@@ -36,7 +36,7 @@ public class GithubRepositoryResourceExternalDto {
     }
 
     @JsonProperty("created_at")
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
@@ -56,7 +56,7 @@ public class GithubRepositoryResourceExternalDto {
         this.stars = stars;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

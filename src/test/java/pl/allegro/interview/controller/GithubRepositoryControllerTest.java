@@ -2,8 +2,8 @@ package pl.allegro.interview.controller;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.IsNull;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +22,12 @@ import org.springframework.web.client.RestTemplate;
 import pl.allegro.interview.model.remote.GithubRepositoryResourceExternalDto;
 
 import java.net.ConnectException;
+import java.util.TimeZone;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -48,14 +50,14 @@ public class GithubRepositoryControllerTest {
 
     private MockRestServiceServer mockServer;
 
+    @BeforeClass
+    public static void setTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Poland"));
+    }
+
     @Before
     public void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
-    }
-
-    @After
-    public void tearDown() {
-        mockServer.verify();
     }
 
     @Test
@@ -76,7 +78,9 @@ public class GithubRepositoryControllerTest {
                 .andExpect(jsonPath("$.description", is("This your first repo!")))
                 .andExpect(jsonPath("$.cloneUrl", is("https://github.com/octocat/Hello-World.git")))
                 .andExpect(jsonPath("$.stars", is(80)))
-                .andExpect(jsonPath("$.createdAt", is("2011-01-26T19:01:12Z")));
+                .andExpect(jsonPath("$.createdAt", is("2011-01-26T20:01:12")));
+
+        mockServer.verify();
     }
 
     @Test
@@ -98,6 +102,8 @@ public class GithubRepositoryControllerTest {
                 .andExpect(jsonPath("$.cloneUrl").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$.stars").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$.createdAt").value(IsNull.nullValue()));
+
+        mockServer.verify();
     }
 
     @Test
@@ -116,6 +122,8 @@ public class GithubRepositoryControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code", is("EXC_001")))
                 .andExpect(jsonPath("$.message", is("Github repository with this owner and name could not be found.")));
+
+        mockServer.verify();
     }
 
     @Test
@@ -124,7 +132,7 @@ public class GithubRepositoryControllerTest {
         // when
         doThrow(new ResourceAccessException("", new ConnectException()))
                 .when(restTemplate)
-                .getForEntity("https://api.github.com/repos/test-owner/test-repo", GithubRepositoryResourceExternalDto.class);
+                .exchange(anyString(), eq(HttpMethod.GET), any(), eq(GithubRepositoryResourceExternalDto.class));
 
         // then
         this.mockMvc.perform(get("/repositories/test-owner/test-repo"))
@@ -139,7 +147,7 @@ public class GithubRepositoryControllerTest {
         // when
         doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN))
                 .when(restTemplate)
-                .getForEntity(anyString(), any(Class.class));
+                .exchange(anyString(), any(), any(), eq(GithubRepositoryResourceExternalDto.class));
 
         // then
         this.mockMvc.perform(get("/repositories/test-owner/test-repo"))

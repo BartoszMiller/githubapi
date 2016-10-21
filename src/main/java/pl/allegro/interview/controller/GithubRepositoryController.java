@@ -1,8 +1,10 @@
 package pl.allegro.interview.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.allegro.interview.assembler.Assembler;
 import pl.allegro.interview.model.GithubRepositoryResource;
@@ -18,13 +20,15 @@ public class GithubRepositoryController {
 
     public GithubRepositoryController(GithubRepositoryService githubRepositoryServiceRest,
                                       Assembler<GithubRepositoryResourceExternalDto, GithubRepositoryResource> githubRepositoryResourceAssembler) {
+
         this.githubRepositoryServiceRest = githubRepositoryServiceRest;
         this.githubRepositoryResourceAssembler = githubRepositoryResourceAssembler;
     }
 
-    @RequestMapping("/{owner}/{repository-name}")
+    @RequestMapping(value = "/{owner}/{repository-name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GithubRepositoryResource> getRepoByOwnerAndRepoName(@PathVariable("owner") final String owner,
                                                                               @PathVariable("repository-name") final String repoName) {
+
         GithubRepositoryResourceExternalDto repositoryResourceExternal = githubRepositoryServiceRest.getRepoByOwnerAndRepoName(owner, repoName);
         GithubRepositoryResource githubRepositoryResource = githubRepositoryResourceAssembler.toResource(repositoryResourceExternal);
         return ResponseEntity.ok(githubRepositoryResource);

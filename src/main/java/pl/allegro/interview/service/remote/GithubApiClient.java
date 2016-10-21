@@ -1,39 +1,54 @@
 package pl.allegro.interview.service.remote;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import pl.allegro.interview.model.remote.GithubRepositoryResourceExternalDto;
 
-import java.net.URI;
+import java.util.Collections;
 
 @Component
 public class GithubApiClient {
 
     private final RestTemplate restTemplate;
-    private final String githubUrlApi;
-    private String githubUrlRepos;
+    private final String githubApiUrlRoot;
+    private final String githubApiUrlRepos;
+    private final String githubApiVersion;
 
     public GithubApiClient(RestTemplate restTemplate,
-                           @Value("${github.url.api}") String githubUrlApi,
-                           @Value("${github.url.repos}") String githubUrlRepos) {
+                           @Value("${github.api.url.root}") String githubApiUrlRoot,
+                           @Value("${github.api.url.repos}") String githubApiUrlRepos,
+                           @Value("${github.api.version}") String githubApiVersion) {
         this.restTemplate = restTemplate;
-        this.githubUrlApi = githubUrlApi;
-        this.githubUrlRepos = githubUrlRepos;
+        this.githubApiUrlRoot = githubApiUrlRoot;
+        this.githubApiUrlRepos = githubApiUrlRepos;
+        this.githubApiVersion = githubApiVersion;
     }
 
     public GithubRepositoryResourceExternalDto getRepoByOwnerAndRepoName(String owner, String repoName) {
+
         String uri = buildGithubRepositoryUri(owner, repoName);
-        ResponseEntity<GithubRepositoryResourceExternalDto> forEntity = restTemplate.getForEntity(uri, GithubRepositoryResourceExternalDto.class);
-        return forEntity.getBody();
+        HttpHeaders headers = buildHeaders();
+        return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(headers), GithubRepositoryResourceExternalDto.class).getBody();
+    }
+
+    private HttpHeaders buildHeaders() {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.valueOf(githubApiVersion)));
+        return headers;
     }
 
     private String buildGithubRepositoryUri(String owner, String repoName) {
+
         return UriComponentsBuilder
-                .fromHttpUrl(githubUrlApi)
-                .pathSegment(githubUrlRepos, owner, repoName)
+                .fromHttpUrl(githubApiUrlRoot)
+                .pathSegment(githubApiUrlRepos, owner, repoName)
                 .build()
                 .toUri()
                 .toString();
